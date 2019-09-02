@@ -1,0 +1,11 @@
+{
+  "name": "cpsim",
+  "version": "1.0.0",
+  "description": "A Charge point simulator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Snehanshu Phukon",
+  "license": "UNLICENSED"
+}
