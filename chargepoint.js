@@ -87,6 +87,8 @@ class ChargePoint {
                     const type = msg[0];
                     const id = msg[1];
 
+                    console.log('Received a msg', msg);
+
                     if (type == 2) { // CALL
                         const action = msg[2];
                         const fn = this.callHandlers[action];
@@ -126,6 +128,7 @@ class ChargePoint {
             const msg = JSON.stringify([msgTypeId, uniqueId, action, payload]);
 
             this.connection.sendUTF(msg);
+            console.log('Sent a msg', msg);
             this.registerCall(uniqueId, resolve);
         });
     }
@@ -141,6 +144,7 @@ class ChargePoint {
 
                 var response = JSON.stringify([3, msg[1], payload]);
                 self.connection.sendUTF(response);
+                console.log('Sent a message', response);
             }
 
             this.error = function () {
