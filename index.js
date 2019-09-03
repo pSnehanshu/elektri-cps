@@ -2,9 +2,9 @@ require('dotenv').config();
 const Chargepoint = require('./chargepoint');
 
 const cp = new Chargepoint({
-    serialno: '789456',
-    brand: 'Exicom',
-    model: 'Model 1',
+    serialno: process.env.SERIALNO,
+    brand: process.env.BRAND,
+    model: process.env.MODEL,
 });
 
 (async function () {
