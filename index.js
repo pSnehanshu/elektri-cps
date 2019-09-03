@@ -24,7 +24,7 @@ async function connect() {
         // Set status notification
         connectors.forEach((connector, i) => {
             cp.send('StatusNotification', {
-                connectorId: i,
+                connectorId: i+1,
                 errorCode: 'NoError',
                 status: 'Available',
                 info: JSON.stringify({
