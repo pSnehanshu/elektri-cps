@@ -2,21 +2,25 @@
     {
         "level": "Level 1",
         "type": "AC",
-        "throughput": 20
+        "throughput": 20,
+        "ctype": "J1772"
     },
     {
         "level": "Level 1",
         "type": "AC",
-        "throughput": 20
+        "throughput": 20,
+        "ctype": "CHAdeMO"
     },
     {
         "level": "Level 1",
         "type": "AC",
-        "throughput": 20
+        "throughput": 20,
+        "ctype": "CCS-2"
     },
     {
         "level": "Level 1",
         "type": "AC",
-        "throughput": 20
+        "throughput": 20,
+        "ctype": "J1772"
     }
 ]

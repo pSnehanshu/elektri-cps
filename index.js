@@ -31,9 +31,10 @@ async function connect() {
                     level: connector.level,
                     type: connector.type,
                     throughput: connector.throughput,
+                    ctype: connector.ctype,
                 }),
             }).then(msg => {
-                console.log(msg);
+                console.log('StatusNotification successful', msg);
             }).catch(err => {
                 console.error('StatusNotification error:', err.message);
             });
