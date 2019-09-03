@@ -24,6 +24,10 @@ class ChargePoint {
 
         // Setting meter value (wh)
         this.meterValue = cpfile.meterValue || 0;
+
+        // Setting brand and model
+        this.brand = cpfile.brand;
+        this.model = cpfile.model;
     }
 
     getParam(param) {
@@ -181,8 +185,8 @@ class ChargePoint {
             console.log('Sending BootNotification...');
 
             var msg = await this.send('BootNotification', {
-                chargePointModel: 'HOMEADVANCED',
-                chargePointVendor: 'eNovates',
+                chargePointModel: this.model,
+                chargePointVendor: this.brand,
             });
 
             var payload = msg[2];
@@ -191,10 +195,11 @@ class ChargePoint {
             if (status == 'Accepted') {
                 this.accepted = true;
                 console.log('Charge point has been accepted');
-                this.startHeartbeat(90 * 1000);
+                this.startHeartbeat(parseFloat(payload.interval || 90) * 1000);
             }
             else if (status == 'Rejected') {
                 this.accepted = false;
+                retry = parseFloat(payload.interval || (retry/1000)) * 1000;
                 console.error(`Charge-point has been rejected by the backend.\nRetying after ${retry / 1000}s...`);
                 setTimeout(() => this.boot(), retry);
             }
