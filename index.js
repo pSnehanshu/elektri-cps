@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Chargepoint = require('./chargepoint');
+const connectors = require(process.env.CONNECTORS_FILE);
 
 const cp = new Chargepoint({
     serialno: process.env.SERIALNO,
@@ -18,7 +19,26 @@ const cp = new Chargepoint({
 async function connect() {
     try {
         await cp.connect();
-        return await cp.boot();
+        await cp.boot();
+
+        // Set status notification
+        connectors.forEach((connector, i) => {
+            cp.send('StatusNotification', {
+                connectorId: i,
+                errorCode: 'NoError',
+                status: 'Available',
+                info: JSON.stringify({
+                    level: connector.level,
+                    type: connector.type,
+                    throughput: connector.throughput,
+                }),
+            }).then(msg => {
+                console.log(msg);
+            }).catch(err => {
+                console.error('StatusNotification error:', err.message);
+            });
+        });
+
     } catch (error) {
         console.error(error);
         setTimeout(connect, 5000);

@@ -1,0 +1,22 @@
+[
+    {
+        "level": "Level 1",
+        "type": "AC",
+        "throughput": 20
+    },
+    {
+        "level": "Level 1",
+        "type": "AC",
+        "throughput": 20
+    },
+    {
+        "level": "Level 1",
+        "type": "AC",
+        "throughput": 20
+    },
+    {
+        "level": "Level 1",
+        "type": "AC",
+        "throughput": 20
+    }
+]
