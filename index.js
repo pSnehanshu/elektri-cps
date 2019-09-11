@@ -21,10 +21,43 @@ async function connect() {
         await cp.connect();
         await cp.boot();
 
+        // Handling RemoteStartTransaction
+        cp.on('RemoteStartTransaction', async function (msg, res) {
+            try {
+                var { connectorId, idTag } = msg;
+                res.success({
+                    status: 'Accepted',
+                });
+
+                // set to preparing
+                var data = await cp.setStatus('Available', connectorId);
+
+                var data = await cp.send('Authorize', { idTag });
+                if (data.idTagInfo.status == 'Accepted') {
+                    // set to preparing
+                    var data = await cp.setStatus('Occupied', connectorId);
+
+                    var data = await cp.send('StartTransaction', {
+                        connectorId, idTag,
+                        meterStart: 0,
+                        timestamp: new Date,
+                    });
+
+                    if (data.idTagInfo.status == 'Accepted') {
+                        console.log(`StartTransaction was accepted by backend. txId ${data.transactionId}`);
+                    } else {
+                        console.error('StartTransaction was NOT accepted by backend');
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        });
+
         // Set status notification
         connectors.forEach((connector, i) => {
             cp.send('StatusNotification', {
-                connectorId: i+1,
+                connectorId: i + 1,
                 errorCode: 'NoError',
                 status: 'Available',
                 info: JSON.stringify({
