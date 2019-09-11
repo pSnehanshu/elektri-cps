@@ -46,8 +46,32 @@ async function connect() {
                     if (data.idTagInfo.status == 'Accepted') {
                         console.log(`StartTransaction was accepted by backend. txId ${data.transactionId}`);
                     } else {
-                        console.error('StartTransaction was NOT accepted by backend');
+                        console.error(`StartTransaction was NOT accepted by backend. txId ${data.transactionId}`);
                     }
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        });
+
+        cp.on('RemoteStopTransaction', async function (msg, res) {
+            try {
+                var { transactionId } = msg;
+                res.success({
+                    status: 'Accepted',
+                });
+
+                var data = await cp.send('StopTransaction', {
+                    meterStop: 12,
+                    timestamp: new Date,
+                    transactionId,
+                    reason: 'Remote',
+                });
+
+                if (data.idTagInfo.status == 'Accepted') {
+                    console.log(`StopTransaction was accepted by backend. txId ${transactionId}`);
+                } else {
+                    console.error(`StopTransaction was NOT accepted by backend. txId ${transactionId}`);
                 }
             } catch (error) {
                 console.error(error);
