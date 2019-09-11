@@ -8,7 +8,7 @@
     {
         "level": "Level 1",
         "type": "DC",
-        "throughput": 10,
+        "throughput": 15,
         "ctype": "CHAdeMO"
     },
     {
