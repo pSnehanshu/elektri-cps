@@ -93,7 +93,8 @@ class ChargePoint {
 
                     console.log('Received a msg', msg);
 
-                    if (type == 2) { // CALL
+                    // Look for handlers to handle the message
+                    if (type == 2) { // This is a CALL message
                         const action = msg[2];
                         const fn = this.callHandlers[action];
 
@@ -101,15 +102,33 @@ class ChargePoint {
                         if (typeof fn == 'function') {
                             fn(msg, this.callRespond(msg));
                         }
-                    }
-                    else {
+                    } else { // This is either a CALLRESULT or a CALLERROR message
                         // Check if callbacks are registered for the response
                         if (this.callResultHandlers[id]) {
                             if (!Array.isArray(this.callResultHandlers[id])) {
                                 this.callResultHandlers[id] = [this.callResultHandlers[id]];
                             }
-                            this.callResultHandlers[id].forEach(cb => typeof cb == 'function' && cb(msg));
-                            // After all response handled, removed the CALL
+                            this.callResultHandlers[id].forEach(handlers => {
+                                // Get the correct handler based on the message type
+                                let cb = null; // This message may be invalid (Neither CALLRESULT nor CALLERROR)
+                                let args = msg;
+
+                                if (type == 2) { // CALLRESULT
+                                    cb = handlers.success;
+                                    args = msg[2]; // Only passing the payload
+                                } else if (type == 3) { // CALLERROR
+                                    cb = handlers.error;
+                                    args = {
+                                        code: msg[2],
+                                        message: msg[3],
+                                        info: msg[4],
+                                    };
+                                }
+
+                                typeof cb == 'function' && cb(args);
+                            });
+
+                            // After all response handled, removed the handlers
                             delete this.callResultHandlers[id];
                         }
                     }
@@ -141,7 +160,7 @@ class ChargePoint {
         const self = this;
 
         function respond() {
-            this.success = function (payload) {
+            this.success = function (payload = {}) {
                 if (!self.connection) {
                     return self.io.cps_emit('err', 'Connection with the backend has not yet been established.\nPlease connect to the backend first.');
                 }
@@ -165,7 +184,7 @@ class ChargePoint {
         this.callHandlers[action] = cb;
     }
 
-    registerCall(id, cb) {
+    registerCall(id, cb, err_cb) {
         // Create entry if new ID
         if (!this.callResultHandlers[id]) {
             this.callResultHandlers[id] = [];
@@ -176,7 +195,10 @@ class ChargePoint {
         }
 
         // Finally push the callback
-        this.callResultHandlers[id].push(cb);
+        this.callResultHandlers[id].push({
+            success: cb,
+            error: err_cb,
+        });
     }
 
     async boot() {
@@ -199,7 +221,7 @@ class ChargePoint {
             }
             else if (status == 'Rejected') {
                 this.accepted = false;
-                retry = parseFloat(payload.interval || (retry/1000)) * 1000;
+                retry = parseFloat(payload.interval || (retry / 1000)) * 1000;
                 console.error(`Charge-point has been rejected by the backend.\nRetying after ${retry / 1000}s...`);
                 setTimeout(() => this.boot(), retry);
             }
