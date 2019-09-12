@@ -113,10 +113,10 @@ class ChargePoint {
                                 let cb = null; // This message may be invalid (Neither CALLRESULT nor CALLERROR)
                                 let args = msg;
 
-                                if (type == 2) { // CALLRESULT
+                                if (type == 3) { // CALLRESULT
                                     cb = handlers.success;
                                     args = msg[2]; // Only passing the payload
-                                } else if (type == 3) { // CALLERROR
+                                } else if (type == 4) { // CALLERROR
                                     cb = handlers.error;
                                     args = {
                                         code: msg[2],
