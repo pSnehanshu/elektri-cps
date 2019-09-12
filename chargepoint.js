@@ -100,7 +100,7 @@ class ChargePoint {
 
                         // Check if handlers are registered for the call
                         if (typeof fn == 'function') {
-                            fn(msg, this.callRespond(msg));
+                            fn(msg[3], this.callRespond(msg));
                         }
                     } else { // This is either a CALLRESULT or a CALLERROR message
                         // Check if callbacks are registered for the response
@@ -206,22 +206,19 @@ class ChargePoint {
             var retry = 10000;
             console.log('Sending BootNotification...');
 
-            var msg = await this.send('BootNotification', {
+            var data = await this.send('BootNotification', {
                 chargePointModel: this.model,
                 chargePointVendor: this.brand,
             });
 
-            var payload = msg[2];
-            var status = payload.status;
-
-            if (status == 'Accepted') {
+            if (data.status == 'Accepted') {
                 this.accepted = true;
                 console.log('Charge point has been accepted');
-                this.startHeartbeat(parseFloat(payload.interval || 90) * 1000);
+                this.startHeartbeat(parseFloat(data.interval || 90) * 1000);
             }
-            else if (status == 'Rejected') {
+            else if (data.status == 'Rejected') {
                 this.accepted = false;
-                retry = parseFloat(payload.interval || (retry / 1000)) * 1000;
+                retry = parseFloat(data.interval || (retry / 1000)) * 1000;
                 console.error(`Charge-point has been rejected by the backend.\nRetying after ${retry / 1000}s...`);
                 setTimeout(() => this.boot(), retry);
             }
