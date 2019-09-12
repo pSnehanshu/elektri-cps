@@ -12,17 +12,20 @@ const cp = new Chargepoint({
 cp.on('RemoteStartTransaction', async function (msg, res) {
     try {
         var { connectorId, idTag } = msg;
+        console.log(msg);
         res.success({
             status: 'Accepted',
         });
 
         // set to preparing
-        var data = await cp.setStatus('Available', connectorId);
+        //var data = await cp.setStatus('Available', connectorId);
 
         var data = await cp.send('Authorize', { idTag });
         if (data.idTagInfo.status == 'Accepted') {
             // set to preparing
-            var data = await cp.setStatus('Occupied', connectorId);
+            //var data = await cp.setStatus('Occupied', connectorId);
+
+            console.log(connectorId, idTag);
 
             var data = await cp.send('StartTransaction', {
                 connectorId, idTag,
