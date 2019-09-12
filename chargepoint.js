@@ -143,9 +143,9 @@ class ChargePoint {
             if (!this.connection) {
                 return reject('Connection with the backend has not yet been established.\nPlease connect to the backend first.');
             }
-            if (!this.accepted && action != 'BootNotification') {
+            /*if (!this.accepted && action != 'BootNotification') {
                 return reject('Charge-point has not yet been accepted by the backend.\nPlease send BootNotification first and then retry.');
-            }
+            }*/
             const msgTypeId = 2;
             const uniqueId = 'msg_' + shortid.generate();
             const msg = JSON.stringify([msgTypeId, uniqueId, action, payload]);
