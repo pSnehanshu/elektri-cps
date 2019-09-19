@@ -68,6 +68,27 @@ cp.on('RemoteStopTransaction', async function (msg, res) {
     }
 });
 
+// Reservation logic
+cp.on('ReserveNow', function (msg, res) {
+    console.log('Reservation created. ID: ', msg.reservationId);
+
+    // Logic to record reservation
+
+    res.success({
+        status: 'Accepted',
+    });
+});
+
+cp.on('CancelReservation', function (msg, res) {
+    console.log('Reservation cancelled. ID: ', msg.reservationId);
+
+    // Logic to verify reservation
+
+    res.success({
+        status: 'Accepted',
+    });
+});
+
 (async function () {
     try {
         await connect();
