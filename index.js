@@ -116,6 +116,21 @@ cp.on('CancelReservation', function (msg, res) {
     });
 });
 
+// Configurations
+cp.on('ChangeConfiguration', function (msg, res) {
+    res.success({
+        status: 'Accepted',
+    });
+});
+cp.on('GetConfiguration', function (msg, res) {
+    var keys = msg.key;
+    var responseKeys = keys.map(k => ({ key: k, readonly: false, value: 'dummy_value' }));
+    res.success({
+        configurationKey: responseKeys,
+        unknownKey: [],
+    });
+});
+
 (async function () {
     try {
         await connect();
