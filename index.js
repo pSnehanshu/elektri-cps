@@ -8,6 +8,8 @@ const cp = new Chargepoint({
     model: process.env.MODEL,
 });
 
+var meterValuesInterval = 0;
+
 // Handling RemoteStartTransaction
 cp.on('RemoteStartTransaction', async function (msg, res) {
     try {
@@ -35,6 +37,30 @@ cp.on('RemoteStartTransaction', async function (msg, res) {
 
             if (data.idTagInfo.status == 'Accepted') {
                 console.log(`StartTransaction was accepted by backend. txId ${data.transactionId}`);
+                
+                // Should send meter values periodically
+                var value = 0;
+                meterValuesInterval = setInterval(() => {
+                    cp.send('MeterValues', {
+                        connectorId,
+                        transactionId: data.transactionId,
+                        meterValue: [
+                            {
+                                timestamp: new Date,
+                                sampledValue: [
+                                    {
+                                        value: (value + 10).toString(),
+                                        context: 'Sample.Periodic',
+                                        format: 'Raw',
+                                        measurand: 'Energy.Active.Import.Register',
+                                        location: 'Outlet',
+                                        unit: 'Wh',
+                                    },
+                                ],
+                            }
+                        ],
+                    }).then(() => {}).catch(() => {}); // Nothing to do
+                }, 60000);
             } else {
                 console.error(`StartTransaction was NOT accepted by backend. txId ${data.transactionId}`);
             }
@@ -60,6 +86,7 @@ cp.on('RemoteStopTransaction', async function (msg, res) {
 
         if (data.idTagInfo.status == 'Accepted') {
             console.log(`StopTransaction was accepted by backend. txId ${transactionId}`);
+            clearInterval(meterValuesInterval);
         } else {
             console.error(`StopTransaction was NOT accepted by backend. txId ${transactionId}`);
         }
