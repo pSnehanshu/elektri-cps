@@ -131,6 +131,11 @@ cp.on('GetConfiguration', function (msg, res) {
     });
 });
 
+//UpdateFirmware
+cp.on('UpdateFirmware', function (msg, res) {
+    res.success();
+});
+
 (async function () {
     try {
         await connect();
