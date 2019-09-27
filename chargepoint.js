@@ -76,15 +76,19 @@ class ChargePoint {
                 connection.on('error', (error) => {
                     console.error("Connection Error: " + error.toString());
                 });
-                connection.on('close', async () => {
+                connection.on('close', () => {
                     console.error('Websocket Connection Closed');
                     this.connection = null;
-                    try {
-                        await this.connect(5);
-                        await this.boot();
-                    } catch (error) {
-                        console.error('Unable to connect to backend. Retrying...');
-                    }
+
+                    var wait = 5;
+                    setTimeout(async () => {
+                        try {
+                            await this.connect(wait);
+                            await this.boot();
+                        } catch (error) {
+                            console.error('Unable to connect to backend. Retrying...');
+                        }
+                    }, wait * 1000);
                 });
                 connection.on('message', (message) => {
                     const msg = JSON.parse(message.utf8Data);
